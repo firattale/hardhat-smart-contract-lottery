@@ -1,6 +1,6 @@
 const { network, ethers } = require("hardhat");
 const { developmentChains, networkConfig } = require("../helper-hardhat-config");
-
+const { verify } = require("../utils/verify");
 const VRF_SUB_FUND_AMOUNT = ethers.utils.parseEther("2");
 module.exports = async function ({ getNamedAccounts, deployments }) {
 	const { deploy, log } = deployments;
@@ -22,10 +22,19 @@ module.exports = async function ({ getNamedAccounts, deployments }) {
 		subscriptionId = networkConfig[chainId].subscriptionId;
 	}
 	const { entranceFee, gasLane, callbackGasLimit, interval } = networkConfig[chainId];
+	const args = [vrfCoordinatorV2Address, entranceFee, gasLane, subscriptionId, callbackGasLimit, interval];
+
 	const raffle = await deploy("Raffle", {
 		from: deployer,
-		args: [vrfCoordinatorV2Address, entranceFee, gasLane, subscriptionId, callbackGasLimit, interval],
+		args,
 		log: true,
 		waitConfirmations: network.config.blockConfirmations || 1,
 	});
+	if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
+		log("Verifying contract...");
+		await verify(raffle.address, args);
+	}
+	log("----------------------------------------");
 };
+
+module.exports.tags = ["all", "raffle"];
