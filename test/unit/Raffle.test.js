@@ -91,7 +91,7 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
 				it("reverts if checkUpkeep is false", async () => {
 					await expect(raffle.performUpkeep([])).to.be.revertedWith("Raffle__UpkeepNotNeeded");
 				});
-				it.only("updates the state, emits an event and calls the vrf coordinator ", async () => {
+				it("updates the state, emits an event and calls the vrf coordinator ", async () => {
 					await raffle.enterRaffle({ value: entranceFee });
 					await network.provider.send("evm_increaseTime", [interval.toNumber() + 1]);
 					await network.provider.send("evm_mine", []);
@@ -101,6 +101,60 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
 					const raffleState = await raffle.getRaffleState();
 					assert(requestId.toNumber() > 0);
 					assert(raffleState === 1);
+				});
+			});
+			describe("fullfillRandomWords", () => {
+				beforeEach(async () => {
+					await raffle.enterRaffle({ value: entranceFee });
+					await network.provider.send("evm_increaseTime", [interval.toNumber() + 1]);
+					await network.provider.send("evm_mine", []);
+				});
+				it("can only be called after performUpkeep ", async () => {
+					await expect(vrfCoordinatorV2Mock.fulfillRandomWords(0, raffle.address)).to.be.revertedWith(
+						"nonexistent request"
+					);
+					await expect(vrfCoordinatorV2Mock.fulfillRandomWords(1, raffle.address)).to.be.revertedWith(
+						"nonexistent request"
+					);
+				});
+				it.only("picks a winner, resets the lottery and sends the money", async () => {
+					const additionalEntrants = 3;
+					const startingAccountIndex = 1; // deployer is 0
+					const accounts = await ethers.getSigners();
+					for (let i = startingAccountIndex; i < startingAccountIndex + additionalEntrants; i++) {
+						const accountConnectedRaffle = await raffle.connect(accounts[i]);
+						await accountConnectedRaffle.enterRaffle({ value: entranceFee });
+					}
+					const startingTimeStamp = await raffle.getLatestTimeStamp();
+					// performUpkeep(mock being Chainlink Keepers)
+					// fulfillRandomWords(mock being Chainlink VRF)
+					// We will have to wait for the fullfilledRandomWords to be called
+					await new Promise(async (resolve, reject) => {
+						raffle.once("WinnerPicked", async () => {
+							console.log("Found the event");
+							try {
+								const raffleState = await raffle.getRaffleState();
+								const endingTimeStamp = await raffle.getLatestTimeStamp();
+								const numPlayers = await raffle.getNumberOfPlayers();
+								// account 1 is winner
+								const winningEndingBalance = await accounts[1].getBalance();
+								assert.equal(numPlayers.toString(), "0");
+								assert.equal(raffleState, 0);
+								assert(endingTimeStamp > startingTimeStamp);
+								assert.equal(
+									winningEndingBalance.toString(),
+									winningStartingBalance.add(entranceFee.mul(additionalEntrants).add(entranceFee).toString())
+								);
+							} catch (e) {
+								reject(e);
+							}
+							resolve();
+						});
+						const tx = await raffle.performUpkeep([]);
+						const txReceipt = await tx.wait(1);
+						const winningStartingBalance = await accounts[1].getBalance();
+						await vrfCoordinatorV2Mock.fulfillRandomWords(txReceipt.events[1].args.requestId, raffle.address);
+					});
 				});
 			});
 	  });
