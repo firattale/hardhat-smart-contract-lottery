@@ -1,7 +1,7 @@
 import { assert, expect } from "chai";
 import { BigNumber } from "ethers";
-import { network, getNamedAccounts, deployments, ethers } from "hardhat";
-import { developmentChains, networkConfig } from "../../helper-hardhat-config";
+import { network, getNamedAccounts, ethers } from "hardhat";
+import { developmentChains } from "../../helper-hardhat-config";
 import { Raffle } from "../../typechain-types";
 
 developmentChains.includes(network.name)
