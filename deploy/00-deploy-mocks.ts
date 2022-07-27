@@ -1,10 +1,11 @@
-const { network } = require("hardhat");
-const { developmentChains } = require("../helper-hardhat-config");
+import { network, ethers } from "hardhat";
+import { developmentChains } from "../helper-hardhat-config";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 const BASE_FEE = ethers.utils.parseEther("0.25");
 const GAS_PRICE_LINK = 1e9;
 
-module.exports = async function ({ getNamedAccounts, deployments }) {
+const deployMocks = async function ({ getNamedAccounts, deployments }: HardhatRuntimeEnvironment) {
 	const { deploy, log } = deployments;
 	const { deployer } = await getNamedAccounts();
 	if (developmentChains.includes(network.name)) {
@@ -18,4 +19,5 @@ module.exports = async function ({ getNamedAccounts, deployments }) {
 		log("----------------------------------------");
 	}
 };
-module.exports.tags = ["all", "mocks"];
+export default deployMocks;
+deployMocks.tags = ["all", "mocks"];
