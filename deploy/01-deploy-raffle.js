@@ -38,3 +38,9 @@ module.exports = async function ({ getNamedAccounts, deployments }) {
 };
 
 module.exports.tags = ["all", "raffle"];
+
+// 1. Get our SubId for Chainlink VRF and Fund
+// 2. Deploy our contract with using the SubId
+// 3. Register the contract with Chainlink VRF and its subId
+// 4. Register the contract with Chainlink Keepers
+// 5  Run the staging tests

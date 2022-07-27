@@ -117,7 +117,7 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
 						"nonexistent request"
 					);
 				});
-				it.only("picks a winner, resets the lottery and sends the money", async () => {
+				it("picks a winner, resets the lottery and sends the money", async () => {
 					const additionalEntrants = 3;
 					const startingAccountIndex = 1; // deployer is 0
 					const accounts = await ethers.getSigners();
