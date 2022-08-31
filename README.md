@@ -1,4 +1,4 @@
-# hardhat-smart-contract-lottery# 
+# hardhat-smart-contract-lottery#
 
 This is a Hardhat project for creating a Lottery smart contract.
 
@@ -44,7 +44,6 @@ yarn hardhat test
 yarn hardhat coverage
 ```
 
-
 # Deployment to a testnet or mainnet
 
 1. Setup environment variabltes
@@ -65,19 +64,6 @@ Head over to [faucets.chain.link](https://faucets.chain.link/) and get some test
 yarn hardhat deploy --network rinkeby
 ```
 
-## Scripts
-
-After deploy to a testnet or local net, you can run the scripts. 
-
-```
-yarn hardhat run scripts/fund.js
-```
-
-or
-```
-yarn hardhat run scripts/withdraw.js
-```
-
 ## Estimate gas
 
 You can estimate how much gas things cost by running:
@@ -90,10 +76,9 @@ And you'll see and output file called `gas-report.txt`
 
 ### Estimate gas cost in USD
 
-To get a USD estimation of gas cost, you'll need a `COINMARKETCAP_API_KEY` environment variable. You can get one for free from [CoinMarketCap](https://pro.coinmarketcap.com/signup). 
+To get a USD estimation of gas cost, you'll need a `COINMARKETCAP_API_KEY` environment variable. You can get one for free from [CoinMarketCap](https://pro.coinmarketcap.com/signup).
 
-Then, uncomment the line `coinmarketcap: COINMARKETCAP_API_KEY,` in `hardhat.config.js` to get the USD estimation. Just note, everytime you run your tests it will use an API call, so it might make sense to have using coinmarketcap disabled until you need it. You can disable it by just commenting the line back out. 
-
+Then, uncomment the line `coinmarketcap: COINMARKETCAP_API_KEY,` in `hardhat.config.js` to get the USD estimation. Just note, everytime you run your tests it will use an API call, so it might make sense to have using coinmarketcap disabled until you need it. You can disable it by just commenting the line back out.
 
 ## Verify on etherscan
 
@@ -110,17 +95,19 @@ yarn hardhat verify --constructor-args arguments.js DEPLOYED_CONTRACT_ADDRESS
 # Linting
 
 To check linting / code formatting:
+
 ```
 yarn lint
 ```
-or, to fix: 
+
+or, to fix:
+
 ```
 yarn lint:fix
 ```
 
-# Formatting 
+# Formatting
 
 ```
 yarn format
 ```
-
